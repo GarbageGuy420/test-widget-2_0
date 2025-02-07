@@ -1,39 +1,80 @@
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("Widget Initialized");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+    <title>JotForm Tattoo Placement Widget</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 10px; width: 100%; box-sizing: border-box; }
+        .disabled { color: grey; cursor: not-allowed; }
+        .container { max-width: 400px; margin: auto; }
+        fieldset { border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Select Your Tattoo Placement</h3>
 
-    // Subscribe to "ready" event to retrieve data dynamically
-    JFCustomWidget.subscribe("ready", function (data) {
-        console.log("Widget Ready - Fetching Parent Form Data");
+        <!-- Read-only Field Reflecting Parent Form Selection -->
+        <label for="userTattooResponse">User First Tattoo Response:</label>
+        <input type="text" id="userTattooResponse" readonly>
 
-        // Automatically adjust iframe size
-        JFCustomWidget.requestFrameResize({ width: 400, height: 250 });
+        <!-- Tattoo Placement Selection -->
+        <fieldset>
+            <legend>Select Tattoo Placement:</legend>
+            <label>
+                <input type="radio" name="tattooPlacement" value="Arm"> Arm
+            </label><br>
+            <label>
+                <input type="radio" name="tattooPlacement" value="Leg"> Leg
+            </label><br>
+            <label id="torsoLabel">
+                <input type="radio" name="tattooPlacement" value="Torso" id="torsoOption"> Torso
+            </label>
+        </fieldset>
+    </div>
 
-        // Get "Is this your first tattoo?" response dynamically
-        let firstTattooResponse = JFCustomWidget.getWidgetSetting("first_tattoo_question");
-        console.log("First Tattoo Question Response:", firstTattooResponse);
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("Widget Initialized");
 
-        // Display the response inside the widget's short text field
-        document.getElementById("userTattooResponse").value = firstTattooResponse || "Not answered";
+            // Subscribe to "ready" event to retrieve data dynamically
+            JFCustomWidget.subscribe("ready", function (data) {
+                console.log("Widget Ready - Fetching Parent Form Data");
 
-        // Disable "Torso" option if "Yes" is selected
-        if (firstTattooResponse === "Yes") {
-            document.getElementById("torsoOption").disabled = true;
-            document.getElementById("torsoLabel").classList.add("disabled");
-        }
-    });
+                // Automatically adjust iframe size
+                JFCustomWidget.requestFrameResize({ width: 400, height: 250 });
 
-    // Capture user selection and send it back to JotForm
-    document.querySelectorAll("input[name='tattooPlacement']").forEach(radio => {
-        radio.addEventListener("change", function () {
-            let selectedPlacement = document.querySelector("input[name='tattooPlacement']:checked").value;
-            console.log("User selected:", selectedPlacement);
+                // Get "Is this your first tattoo?" response dynamically
+                let firstTattooResponse = JFCustomWidget.getWidgetSetting("first_tattoo_question");
+                console.log("First Tattoo Question Response:", firstTattooResponse);
 
-            // Send the selected placement back to JotForm
-            let result = {
-                valid: true,
-                value: selectedPlacement
-            };
-            JFCustomWidget.sendSubmit(result);
+                // Display the response inside the widget's short text field
+                document.getElementById("userTattooResponse").value = firstTattooResponse || "Not answered";
+
+                // Disable "Torso" if "Yes" is selected
+                if (firstTattooResponse === "Yes") {
+                    document.getElementById("torsoOption").disabled = true;
+                    document.getElementById("torsoLabel").classList.add("disabled");
+                }
+            });
+
+            // Capture user selection and send it back to JotForm
+            document.querySelectorAll("input[name='tattooPlacement']").forEach(radio => {
+                radio.addEventListener("change", function () {
+                    let selectedPlacement = document.querySelector("input[name='tattooPlacement']:checked").value;
+                    console.log("User selected:", selectedPlacement);
+
+                    // Send the selected placement back to JotForm
+                    let result = {
+                        valid: true,
+                        value: selectedPlacement
+                    };
+                    JFCustomWidget.sendSubmit(result);
+                });
+            });
         });
-    });
-});
+    </script>
+</body>
+</html>
