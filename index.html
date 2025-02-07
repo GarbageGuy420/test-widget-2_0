@@ -3,45 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
-    <title>JotForm Tattoo Placement Widget</title>
+    <title>Greeting Widget</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 10px; width: 100%; box-sizing: border-box; }
-        .container { max-width: 400px; margin: auto; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #welcomeText {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h3>Retrieve "Is this your first tattoo?"</h3>
 
-        <!-- Read-only Field Reflecting Parent Form Selection -->
-        <label for="userTattooResponse">User First Tattoo Response:</label>
-        <input type="text" id="userTattooResponse" readonly value="Waiting for data...">
-    </div>
+    <h2>Welcome Widget</h2>
+    <p id="welcomeText">Hello, Guest!</p>
 
+    <script src="https://js.jotform.com/JFCustomWidget.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            console.log("Widget Initialized");
+        // Function to update the greeting message
+        function updateGreeting(name) {
+            let greetingText = name ? `Hello, ${name}!` : "Hello, Guest!";
+            document.getElementById("welcomeText").innerText = greetingText;
 
-            // Subscribe to "ready" event to retrieve parent form data
-            JFCustomWidget.subscribe("ready", function () {
-                console.log("Widget Ready - Fetching Parent Form Data");
-
-                // Attempt to retrieve form data
-                JFCustomWidget.getData(function (formData) {
-                    console.log("Received form data:", formData);
-
-                    // Check if q3_first_tattoo_question exists in formData
-                    if (formData.q3_first_tattoo_question) {
-                        document.getElementById("userTattooResponse").value = formData.q3_first_tattoo_question;
-                        console.log("Updated widget display:", formData.q3_first_tattoo_question);
-                    } else {
-                        document.getElementById("userTattooResponse").value = "No data received!";
-                        console.warn("Field 'q3_first_tattoo_question' not found in formData!");
-                    }
-                });
+            // Send the updated name back to the parent form
+            JFCustomWidget.sendData({
+                value: name || "Guest",
+                valid: true
             });
+        }
+
+        // Listen for form data when widget is ready
+        JFCustomWidget.subscribe("ready", function(formData) {
+            let name = formData["name"] || "";
+            updateGreeting(name);
+        });
+
+        // Listen for changes in the name field
+        JFCustomWidget.subscribe("change", function(changes) {
+            if (changes["name"] !== undefined) {
+                updateGreeting(changes["name"]);
+            }
         });
     </script>
+
 </body>
 </html>
