@@ -22,6 +22,7 @@
     <h2>Welcome Widget</h2>
     <p id="welcomeText">Hello, Guest!</p>
 
+    <!-- Jotform Widget API -->
     <script src="https://js.jotform.com/JFCustomWidget.js"></script>
     <script>
         // Function to update the greeting message
@@ -29,23 +30,27 @@
             let greetingText = name ? `Hello, ${name}!` : "Hello, Guest!";
             document.getElementById("welcomeText").innerText = greetingText;
 
-            // Send the updated name back to the parent form
+            // Send the updated name back to Jotform
             JFCustomWidget.sendData({
                 value: name || "Guest",
                 valid: true
             });
         }
 
-        // Listen for form data when widget is ready
+        // When the widget is ready, fetch initial form data
         JFCustomWidget.subscribe("ready", function(formData) {
-            let name = formData["name"] || "";
+            console.log("Widget Loaded. Received form data:", formData); // Debugging
+
+            let name = formData["q6_name"] || "";  // Use "q6_name" as per Jotform field name
             updateGreeting(name);
         });
 
-        // Listen for changes in the name field
+        // Listen for changes in the "NAME" field dynamically
         JFCustomWidget.subscribe("change", function(changes) {
-            if (changes["name"] !== undefined) {
-                updateGreeting(changes["name"]);
+            console.log("Detected form field changes:", changes); // Debugging
+
+            if (changes["q6_name"] !== undefined) {
+                updateGreeting(changes["q6_name"]);
             }
         });
     </script>
