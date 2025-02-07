@@ -7,76 +7,37 @@
     <title>JotForm Tattoo Placement Widget</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 10px; width: 100%; box-sizing: border-box; }
-        .disabled { color: grey; cursor: not-allowed; }
         .container { max-width: 400px; margin: auto; }
-        fieldset { border: 1px solid #ccc; padding: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h3>Select Your Tattoo Placement</h3>
+        <h3>Retrieve "Is this your first tattoo?"</h3>
 
         <!-- Read-only Field Reflecting Parent Form Selection -->
         <label for="userTattooResponse">User First Tattoo Response:</label>
-        <input type="text" id="userTattooResponse" readonly>
-
-        <!-- Tattoo Placement Selection -->
-        <fieldset>
-            <legend>Select Tattoo Placement:</legend>
-            <label>
-                <input type="radio" name="tattooPlacement" value="Arm"> Arm
-            </label><br>
-            <label>
-                <input type="radio" name="tattooPlacement" value="Leg"> Leg
-            </label><br>
-            <label id="torsoLabel">
-                <input type="radio" name="tattooPlacement" value="Torso" id="torsoOption"> Torso
-            </label>
-        </fieldset>
+        <input type="text" id="userTattooResponse" readonly value="Waiting for data...">
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             console.log("Widget Initialized");
 
-            // Subscribe to "ready" event to retrieve data dynamically
+            // Subscribe to "ready" event to retrieve parent form data
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget Ready - Fetching Parent Form Data");
 
-                // Automatically adjust iframe size
-                JFCustomWidget.requestFrameResize({ width: 400, height: 250 });
-
-                // Get form data dynamically
+                // Attempt to retrieve form data
                 JFCustomWidget.getData(function (formData) {
                     console.log("Received form data:", formData);
 
-                    // Fetch "Is this your first tattoo?" response from parent form
-                    let firstTattooResponse = formData.q3_first_tattoo_question || "Not answered";
-                    document.getElementById("userTattooResponse").value = firstTattooResponse;
-
-                    // Disable "Torso" if "YES" is selected
-                    if (firstTattooResponse === "YES") {
-                        document.getElementById("torsoOption").disabled = true;
-                        document.getElementById("torsoLabel").classList.add("disabled");
-                    }
-                });
-            });
-
-            // Capture user selection and send it back to JotForm
-            document.querySelectorAll("input[name='tattooPlacement']").forEach(radio => {
-                radio.addEventListener("change", function () {
-                    let selectedPlacement = document.querySelector("input[name='tattooPlacement']:checked").value;
-                    console.log("User selected:", selectedPlacement);
-
-                    if (selectedPlacement) {
-                        let result = {
-                            valid: true,
-                            value: selectedPlacement
-                        };
-                        console.log("Sending selection to JotForm:", result);
-                        JFCustomWidget.sendSubmit(result);
+                    // Check if q3_first_tattoo_question exists in formData
+                    if (formData.q3_first_tattoo_question) {
+                        document.getElementById("userTattooResponse").value = formData.q3_first_tattoo_question;
+                        console.log("Updated widget display:", formData.q3_first_tattoo_question);
                     } else {
-                        console.error("No tattoo placement selected!");
+                        document.getElementById("userTattooResponse").value = "No data received!";
+                        console.warn("Field 'q3_first_tattoo_question' not found in formData!");
                     }
                 });
             });
