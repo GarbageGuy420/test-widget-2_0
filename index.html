@@ -40,24 +40,26 @@
             console.log("Widget Initialized");
 
             // Subscribe to "ready" event to retrieve data dynamically
-            JFCustomWidget.subscribe("ready", function (data) {
+            JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget Ready - Fetching Parent Form Data");
 
                 // Automatically adjust iframe size
                 JFCustomWidget.requestFrameResize({ width: 400, height: 250 });
 
-                // Get "Is this your first tattoo?" response dynamically
-                let firstTattooResponse = JFCustomWidget.getWidgetSetting("first_tattoo_question");
-                console.log("First Tattoo Question Response:", firstTattooResponse);
+                // Get form data dynamically
+                JFCustomWidget.getData(function (formData) {
+                    console.log("Received form data:", formData);
 
-                // Display the response inside the widget's short text field
-                document.getElementById("userTattooResponse").value = firstTattooResponse || "Not answered";
+                    // Fetch "Is this your first tattoo?" response from parent form
+                    let firstTattooResponse = formData.q3_first_tattoo_question || "Not answered";
+                    document.getElementById("userTattooResponse").value = firstTattooResponse;
 
-                // Disable "Torso" if "Yes" is selected
-                if (firstTattooResponse === "Yes") {
-                    document.getElementById("torsoOption").disabled = true;
-                    document.getElementById("torsoLabel").classList.add("disabled");
-                }
+                    // Disable "Torso" if "YES" is selected
+                    if (firstTattooResponse === "YES") {
+                        document.getElementById("torsoOption").disabled = true;
+                        document.getElementById("torsoLabel").classList.add("disabled");
+                    }
+                });
             });
 
             // Capture user selection and send it back to JotForm
@@ -66,12 +68,16 @@
                     let selectedPlacement = document.querySelector("input[name='tattooPlacement']:checked").value;
                     console.log("User selected:", selectedPlacement);
 
-                    // Send the selected placement back to JotForm
-                    let result = {
-                        valid: true,
-                        value: selectedPlacement
-                    };
-                    JFCustomWidget.sendSubmit(result);
+                    if (selectedPlacement) {
+                        let result = {
+                            valid: true,
+                            value: selectedPlacement
+                        };
+                        console.log("Sending selection to JotForm:", result);
+                        JFCustomWidget.sendSubmit(result);
+                    } else {
+                        console.error("No tattoo placement selected!");
+                    }
                 });
             });
         });
