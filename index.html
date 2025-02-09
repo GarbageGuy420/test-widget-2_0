@@ -1,70 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greeting Widget</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        #welcomeText {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-    </style>
+<title>JotForm Widget Test</title>
+<script src="https://js.jotform.com/jotform.js"></script>
 </head>
 <body>
+  <div id="myWidget"></div>
 
-    <h2>Welcome Widget</h2>
-    <p id="welcomeText">Hello, Guest!</p>
+  <script>
+    JotForm.on('ready', function() {
+      // **REPLACE "YOUR_ACTUAL_QID" with the actual qid of your field**
+      var myFieldQid = "YOUR_ACTUAL_QID";  // Example: "1_1", but use YOUR qid
 
-    <!-- Jotform Widget API -->
-    <script src="https://js.jotform.com/JFCustomWidget.js" onload="initializeWidget()"></script>
+      var fieldValue = JotForm.getFieldValue(myFieldQid);
 
-    <script>
-        function initializeWidget() {
-            if (typeof JFCustomWidget === "undefined") {
-                console.error("JFCustomWidget is not loaded. Retrying in 1 second...");
-                setTimeout(initializeWidget, 1000);
-                return;
-            }
+      if (fieldValue) { // Check if a value was retrieved
+        console.log("Field value:", fieldValue);
+        document.getElementById("myWidget").textContent = "Field Value: " + fieldValue; // Display in widget
+      } else {
+        console.log("Field value is undefined or null.");
+        document.getElementById("myWidget").textContent = "Field Value: Not Found";
+      }
 
-            console.log("JFCustomWidget Loaded Successfully!");
-
-            // Function to update the greeting message
-            function updateGreeting(name) {
-                let greetingText = name ? `Hello, ${name}!` : "Hello, Guest!";
-                document.getElementById("welcomeText").innerText = greetingText;
-
-                // Send the updated name back to Jotform
-                JFCustomWidget.sendData({
-                    value: name || "Guest",
-                    valid: true
-                });
-            }
-
-            // When the widget is ready, fetch initial form data
-            JFCustomWidget.subscribe("ready", function(formData) {
-                console.log("Widget Loaded. Received form data:", formData); // Debugging
-
-                let name = formData["q6_name"] || "";  // Use "q6_name" as per Jotform field name
-                updateGreeting(name);
-            });
-
-            // Listen for changes in the "NAME" field dynamically
-            JFCustomWidget.subscribe("change", function(changes) {
-                console.log("Detected form field changes:", changes); // Debugging
-
-                if (changes["q6_name"] !== undefined) {
-                    updateGreeting(changes["q6_name"]);
-                }
-            });
+      // Optional: Listen for changes to the field (if needed)
+      JotForm.on('change', function(e) {
+        if (e.target.id === myFieldQid) {
+          fieldValue = JotForm.getFieldValue(myFieldQid);
+          console.log("Field value changed:", fieldValue);
+          document.getElementById("myWidget").textContent = "Field Value: " + fieldValue;
         }
-    </script>
+      });
+    });
+  </script>
 
 </body>
 </html>
