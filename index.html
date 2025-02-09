@@ -12,42 +12,23 @@
 
   <script>
     JFCustomWidget.subscribe("ready", function(formId, value) {
-      // Get the qid of the field you want to track (you'll need to find this)
       var targetFieldQid = "q3_typeA"; // Replace with your field's qid
 
-      // Function to update the widget
       function updateWidget() {
-        // Get the value from the parent form using postMessage
-        window.parent.postMessage({
-          type: "getFieldValue",
-          qid: targetFieldQid
-        }, "*"); // "*" means any origin
-
+        JFCustomWidget.getWidgetSetting(targetFieldQid, function(value) {
+          document.getElementById("widgetTextField").value = value || "";
+        });
       }
 
-      // Listen for the response with the field value
-      window.addEventListener("message", function(event) {
-        if (event.source === window.parent && event.data.type === "getFieldValueResponse") {
-          document.getElementById("widgetTextField").value = event.data.value || "";
-        }
-      });
+      updateWidget(); // Initial update
 
-      // Initial update
-      updateWidget();
-
-      // Listen for changes on the parent form (you'll need to implement this in the parent form)
-      window.parent.postMessage({ type: "subscribe", name: "change" }, "*");
-
-       window.addEventListener("message", function(event) {
-        if (event.source === window.parent && event.data.type === "change") {
+      // Listen for changes (using JotForm's API directly)
+      JFCustomWidget.subscribe("change", function(e) {
+        if (e.qid === targetFieldQid) {
           updateWidget();
         }
       });
-
-
     });
-
-
   </script>
 
 </body>
