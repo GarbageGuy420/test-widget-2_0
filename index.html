@@ -5,29 +5,25 @@
 <script src="https://js.jotform.com/jotform.js"></script>
 </head>
 <body>
-  <div id="myWidget"></div>
+  <div id="myWidget">
+    <p>Value from JotForm:</p>
+    <input type="text" id="widgetTextField" readonly>
+  </div>
 
   <script>
     JotForm.on('ready', function() {
-      // **REPLACE "YOUR_ACTUAL_QID" with the actual qid of your field**
-      var myFieldQid = "YOUR_ACTUAL_QID";  // Example: "1_1", but use YOUR qid
+      var jotFormFieldQid = "q3_typeA"; // Correct qid from your form
 
-      var fieldValue = JotForm.getFieldValue(myFieldQid);
-
-      if (fieldValue) { // Check if a value was retrieved
-        console.log("Field value:", fieldValue);
-        document.getElementById("myWidget").textContent = "Field Value: " + fieldValue; // Display in widget
-      } else {
-        console.log("Field value is undefined or null.");
-        document.getElementById("myWidget").textContent = "Field Value: Not Found";
+      function updateWidgetField() {
+        var jotFormValue = JotForm.getFieldValue(jotFormFieldQid);
+        document.getElementById("widgetTextField").value = jotFormValue || "";
       }
 
-      // Optional: Listen for changes to the field (if needed)
+      updateWidgetField(); // Initial update
+
       JotForm.on('change', function(e) {
-        if (e.target.id === myFieldQid) {
-          fieldValue = JotForm.getFieldValue(myFieldQid);
-          console.log("Field value changed:", fieldValue);
-          document.getElementById("myWidget").textContent = "Field Value: " + fieldValue;
+        if (e.target.id === jotFormFieldQid) { // Check if it's the correct field
+          updateWidgetField();
         }
       });
     });
