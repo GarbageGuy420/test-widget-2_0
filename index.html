@@ -2,15 +2,16 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Yes/No Read-Only Widget</title>
+  <title>Yes/No Read-Only Widget - Optimized</title>
   <script type="text/javascript">
     // This function is called once the JotFormCustomWidget library has loaded.
     function onLoadCallback() {
       console.log("JotFormCustomWidget library loaded.");
 
-      // Subscribe to the parent's "ready" event.
+      // Subscribe to the parent's "ready" event so that the form is fully loaded.
       JFCustomWidget.subscribe("ready", function() {
         console.log("Parent form is ready. Fetching value of q7_yesOr...");
+        // Retrieve the value from the parent's field named "q7_yesOr"
         JFCustomWidget.getFieldsValueByName(["q7_yesOr"], function(data) {
           console.log("Data received:", data);
           var displayField = document.getElementById("displayField");
@@ -21,14 +22,24 @@
           }
         });
       });
+
+      // Subscribe to the form's "submit" event so the widget's value is sent with the submission.
+      JFCustomWidget.subscribe("submit", function() {
+        var displayField = document.getElementById("displayField");
+        var result = {
+          valid: true,             // Mark as valid so the widget passes any required checks
+          value: displayField.value  // The current value from the read-only text box
+        };
+        console.log("Submitting widget value:", result);
+        JFCustomWidget.sendSubmit(result);
+      });
     }
 
-    // Asynchronously load the JotFormCustomWidget library
+    // Asynchronously load the JotFormCustomWidget library with an onload callback.
     (function() {
       var po = document.createElement('script');
       po.type = 'text/javascript';
       po.async = true;
-      // Note: the onload parameter calls our onLoadCallback once the library is loaded.
       po.src = "//js.jotform.com/JotFormCustomWidget.min.js?onload=onLoadCallback";
       var s = document.getElementsByTagName('script')[0];
       s.parentNode.insertBefore(po, s);
@@ -54,7 +65,7 @@
   </style>
 </head>
 <body>
-  <h2>Yes/No Read-Only Widget</h2>
+  <h2>Yes/No Read-Only Widget - Optimized</h2>
   <label for="displayField">Selected value (read-only):</label>
   <input type="text" id="displayField" class="read-only-box" readonly />
   <!-- Optional button to manually refresh the value -->
