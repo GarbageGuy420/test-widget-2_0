@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>Yes/No Read-Only Widget</title>
-  <!-- Load the JotForm Custom Widget API -->
-  <script src="https://cdn.jotfor.ms/s/umd/latest/for-custom-widgets.js"></script>
-  <script>
-    window.addEventListener("DOMContentLoaded", function() {
-      console.log("Widget loaded. Waiting for parent form 'ready' event.");
-      
-      // Subscribe to the parent's "ready" event
+  <script type="text/javascript">
+    // This function is called once the JotFormCustomWidget library has loaded.
+    function onLoadCallback() {
+      console.log("JotFormCustomWidget library loaded.");
+
+      // Subscribe to the parent's "ready" event.
       JFCustomWidget.subscribe("ready", function() {
-        console.log("Parent form is ready. Fetching q7_yesOr value...");
-        
-        // Retrieve the parent's field value by its name "q7_yesOr"
+        console.log("Parent form is ready. Fetching value of q7_yesOr...");
         JFCustomWidget.getFieldsValueByName(["q7_yesOr"], function(data) {
           console.log("Data received:", data);
           var displayField = document.getElementById("displayField");
@@ -24,7 +21,18 @@
           }
         });
       });
-    });
+    }
+
+    // Asynchronously load the JotFormCustomWidget library
+    (function() {
+      var po = document.createElement('script');
+      po.type = 'text/javascript';
+      po.async = true;
+      // Note: the onload parameter calls our onLoadCallback once the library is loaded.
+      po.src = "//js.jotform.com/JotFormCustomWidget.min.js?onload=onLoadCallback";
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(po, s);
+    })();
   </script>
   <style>
     body {
@@ -49,8 +57,7 @@
   <h2>Yes/No Read-Only Widget</h2>
   <label for="displayField">Selected value (read-only):</label>
   <input type="text" id="displayField" class="read-only-box" readonly />
-  
-  <!-- Optional button to manually re-fetch the parent field value -->
+  <!-- Optional button to manually refresh the value -->
   <button onclick="JFCustomWidget.getFieldsValueByName(['q7_yesOr'], function(data) {
       document.getElementById('displayField').value = (data && data['q7_yesOr']) ? data['q7_yesOr'] : 'No selection made';
   });">
