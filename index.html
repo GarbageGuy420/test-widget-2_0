@@ -2,44 +2,59 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Custom Widget Test - typeA</title>
-  <!-- Load the JotForm Custom Widget API from the CDN -->
+  <title>Yes/No Read-Only Widget</title>
+  <!-- Load the JotForm Custom Widget API -->
   <script src="https://cdn.jotfor.ms/s/umd/latest/for-custom-widgets.js"></script>
   <script>
     window.addEventListener("DOMContentLoaded", function() {
-      console.log("Widget loaded, waiting for parent ready event.");
-
-      // Subscribe to the parent form's 'ready' event
+      console.log("Widget loaded. Waiting for parent form 'ready' event.");
+      
+      // Subscribe to the parent's "ready" event
       JFCustomWidget.subscribe("ready", function() {
-        console.log("Received 'ready' event from parent form.");
-
-        // Retrieve the field value by its name "typeA"
-        JFCustomWidget.getFieldsValueByName(["typeA"], function(data) {
-          console.log("Data received from parent:", data);
-          var outputDiv = document.getElementById("output");
-          if (data && data["typeA"]) {
-            outputDiv.innerText = "Value from parent (typeA): " + data["typeA"];
+        console.log("Parent form is ready. Fetching q7_yesOr value...");
+        
+        // Retrieve the parent's field value by its name "q7_yesOr"
+        JFCustomWidget.getFieldsValueByName(["q7_yesOr"], function(data) {
+          console.log("Data received:", data);
+          var displayField = document.getElementById("displayField");
+          if (data && data["q7_yesOr"]) {
+            displayField.value = data["q7_yesOr"];
           } else {
-            outputDiv.innerText = "No data received for field named 'typeA'.";
+            displayField.value = "No selection made";
           }
         });
       });
     });
   </script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #output { margin-top: 20px; font-size: 1.2em; color: #333; }
-    button { margin-top: 10px; padding: 8px 12px; font-size: 1em; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .read-only-box {
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body>
-  <h3>Custom Widget Test</h3>
-  <div id="output">Waiting for parent's field data...</div>
-  <!-- Manual trigger to re-fetch parent field value -->
-  <button onclick="JFCustomWidget.getFieldsValueByName(['typeA'], function(data) {
-      document.getElementById('output').innerText = data && data['typeA'] ? 'Value from parent (typeA): ' + data['typeA'] : 'No data received for field named \'typeA\'.';
-    });">
-    Fetch Parent Field Again
+  <h2>Yes/No Read-Only Widget</h2>
+  <label for="displayField">Selected value (read-only):</label>
+  <input type="text" id="displayField" class="read-only-box" readonly />
+  
+  <!-- Optional button to manually re-fetch the parent field value -->
+  <button onclick="JFCustomWidget.getFieldsValueByName(['q7_yesOr'], function(data) {
+      document.getElementById('displayField').value = (data && data['q7_yesOr']) ? data['q7_yesOr'] : 'No selection made';
+  });">
+    Refresh Value
   </button>
 </body>
 </html>
